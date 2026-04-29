@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soft Aura Student Portal</title>
+    <style>
+        :root {
+            --bg: #fdfcfd;
+            --primary: #a78bfa;
+            --secondary: #f472b6;
+            --text: #1f2937;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Quicksand', sans-serif;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* --- THE LINE ANIMATION --- */
+        .animated-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--primary), var(--secondary), transparent);
+            background-size: 200% 100%;
+            border-radius: 30px 30px 0 0;
+            animation: flowLine 3s linear infinite;
+        }
+
+        @keyframes flowLine {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* --- AURA BACKGROUNDS --- */
+        .aura {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: -1;
+            opacity: 0.4;
+            animation: move 20s infinite alternate;
+        }
+
+        .aura-1 { width: 400px; height: 400px; background: #c084fc; top: -100px; left: -100px; }
+        .aura-2 { width: 500px; height: 500px; background: #fbcfe8; bottom: -150px; right: -100px; }
+        .aura-3 { width: 300px; height: 300px; background: #bae6fd; top: 40%; left: 50%; }
+
+        @keyframes move {
+            from { transform: translate(0, 0); }
+            to { transform: translate(100px, 100px); }
+        }
+
+        .cursor-glow {
+            position: fixed;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(167, 139, 250, 0.2) 0%, transparent 70%);
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+        }
+
+        /* --- PORTAL UI --- */
+        .portal-container {
+            position: relative;
+            width: 90%;
+            max-width: 1000px;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        .header { text-align: center; margin-bottom: 40px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+        .card { background: rgba(255, 255, 255, 0.4); padding: 20px; border-radius: 20px; }
+
+        label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.9rem; }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-top: 8px;
+            border: 1px solid #e5e7eb;
+            border-radius: 15px;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        .soft-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .soft-btn:active { transform: scale(0.98); }
+
+        .quiz { font-size: 0.85rem; margin-top: 15px; color: var(--text); opacity: 0.8; }
+    </style>
+</head>
+<body>
+    <div class="aura aura-1"></div>
+    <div class="aura aura-2"></div>
+    <div class="aura aura-3"></div>
+    <div class="cursor-glow"></div>
+
+    <div class="portal-container">
+        <div class="animated-line"></div>
+
+        <header class="header">
+            <h1>Student Portal</h1>
+            <p>Welcome to your personal registration space</p>
+        </header>
+
+        <main class="grid">
+            <div class="card">
+                <h3>Profile</h3>
+                <div class="field">
+                    <label>Full Name</label>
+                    <input type="text" id="fullName" placeholder="e.g. Alex Rivera">
+                </div>
+                <div class="field">
+                    <label>Email</label>
+                    <input type="email" placeholder="alex@example.com">
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Studies</h3>
+                <div class="field">
+                    <label>Department</label>
+                    <input type="text" id="course" placeholder="Architecture">
+                </div>
+                <div class="field">
+                    <label>Graduation</label>
+                    <input type="number" value="2027">
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Verification</h3>
+                <div class="field">
+                    <label>Portal Secret</label>
+                    <input type="password" placeholder="••••••••">
+                </div>
+                <p class="quiz">Soft Math: 12 + 12?</p>
+                <input type="number" id="quiz" placeholder="Answer">
+            </div>
+
+            <div class="card finalize">
+                <h3>Final Step</h3>
+                <button class="soft-btn" onclick="generateID()">Generate Student ID</button>
+                <div id="displayArea"></div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const glow = document.querySelector('.cursor-glow');
+
+        // Cursor following logic
+        window.addEventListener('mousemove', (e) => {
+            glow.style.left = e.clientX + 'px';
+            glow.style.top = e.clientY + 'px';
+        });
+
+        // ID Generation Logic
+        function generateID() {
+            const name = document.getElementById('fullName').value;
+            const quiz = document.getElementById('quiz').value;
+
+            if (!name || quiz !== "24") {
+                alert("Please enter your name and solve the soft math (12+12=24).");
+                return;
+            }
+
+            const randomID = "SOFT-" + Math.floor(1000 + Math.random() * 9000);
+            document.getElementById('displayArea').innerHTML = `
+                <div style="margin-top:20px; padding:15px; background: #fef2f2; border-radius:15px; border: 1px solid #fecaca; color: #991b1b; text-align: center;">
+                    <strong>Success!</strong> ID Created: ${randomID}
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
